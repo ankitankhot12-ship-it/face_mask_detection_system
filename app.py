@@ -22,10 +22,10 @@ image_source = uploaded_file if option == "Image" else camera_image
 
 if image_source: 
     image = Image.open(image_source) 
-    st.write("---") 
+    st.write("---")
     st.subheader("Crop the face area:") 
     
-    cropped_img = st_cropper(image, realtime_update=True, box_color='red', aspect_ratio=None) 
+    cropped_img = st_cropper(image, realtime_update=True, box_color='red', aspect_ratio=(1,1)) 
     
     cropped_img = cropped_img.resize((150, 150)) 
     st.image(cropped_img, caption="Preview of Cropped Image") 
@@ -35,9 +35,7 @@ st.write("---")
 if st.button("Detect Mask"): 
     image_to_detect = None 
     
-    if uploaded_file is not None: 
-        image_to_detect = cropped_img 
-    elif camera_image is not None: 
+    if image_source is not None:
         image_to_detect = cropped_img 
     else: 
         st.error("Please upload or capture an image first!") 
@@ -49,10 +47,12 @@ if st.button("Detect Mask"):
         img_array = np.expand_dims(img_array, axis=0) 
         
         with st.spinner("Analyzing image..."):
-            result = model.predict(img_array) 
+            prediction = model.predict(img_array) 
+            
+        result_value = prediction[0][0]
             
         st.write("### Result:")
-        if result[0,0] <= 0.5: 
+        if result_value <= 0.5: 
             st.success("✅ Safe: Person is wearing a mask!") 
         else: 
             st.error("🚨 Warning: Person is NOT wearing a mask!")
