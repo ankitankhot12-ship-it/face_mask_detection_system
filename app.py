@@ -43,13 +43,15 @@ if st.button("Detect Mask"):
     if image_to_detect is not None: 
         image_to_detect = image_to_detect.convert("RGB") 
         img = image_to_detect.resize((150, 150)) 
-        img_array = np.array(img, dtype=np.float32) / 255.0 
+        
+        img_array = np.array(img, dtype=np.float32)
+        img_array = (img_array / 127.5) - 1.0
         img_array = np.expand_dims(img_array, axis=0) 
         
         with st.spinner("Analyzing image..."):
             prediction = model.predict(img_array) 
             
-        result_value = prediction[0][0]
+        result_value = float(prediction[0][0])
             
         st.write("### Result:")
         if result_value <= 0.5: 
